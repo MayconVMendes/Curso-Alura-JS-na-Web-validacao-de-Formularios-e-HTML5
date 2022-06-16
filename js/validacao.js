@@ -40,6 +40,11 @@ const mensagensDeErro = {
     cpf: {
         valueMissing: 'O campo de CPF não pode estar vazio.',
         customError: 'O CPF digitado não é válido.' 
+    },
+    cep: {
+        valueMissing: 'O campo de CEP não pode estar vazio.',
+        patternMismatch: 'O CEP digitado não é válido.'
+
     }
 }
 
@@ -50,7 +55,7 @@ const validadores = {
 
 function mostraMensagemDeErro(tipoDeInput, input) {
     let mensagem = ''
-    
+
     tiposDeErro.forEach(erro => {
         if(input.validity[erro]) {
             mensagem = mensagensDeErro[tipoDeInput][erro]
