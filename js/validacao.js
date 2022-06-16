@@ -23,37 +23,24 @@ const tiposDeErro = [
 
 const mensagensDeErro = {
     nome: {
-        valueMissing: 'O campo nome não pode estar vazio.'
-    }, 
+        valueMissing: 'O campo de nome não pode estar vazio.'
+    },
     email: {
-        valueMissing: 'O campo email não pode estar vazio.',
+        valueMissing: 'O campo de email não pode estar vazio.',
         typeMismatch: 'O email digitado não é válido.'
     },
     senha: {
-        valueMissing: 'O campo senha não pode estar vazio.',
-        patternMismatch: 'A senha deve conter entre 6 a 12 caracteres, deve conter pelo menos uma letra maiúscula, um numero e não deve conter símbolos.'
+        valueMissing: 'O campo de senha não pode estar vazio.',
+        patternMismatch: 'A senha deve conter entre 6 a 12 caracteres, deve conter pelo menos uma letra maiúscula, um número e não deve conter símbolos.'
     },
     dataNascimento: {
-        valueMissing: 'O campo Data de Nascimento não pode estar vazio.',
+        valueMissing: 'O campo de data de nascimento não pode estar vazio.',
         customError: 'Você deve ser maior que 18 anos para se cadastrar.'
     },
     cpf: {
-        valueMissing: 'O campo CPF não pode estar vazio.',
-        customError: 'O CPF digitado não é valido.'
+        valueMissing: 'O campo de CPF não pode estar vazio.',
+        customError: 'O CPF digitado não é válido.' 
     }
-    
-}
-
-function mostraMensagemDeErro(tipoDeInput, input) {
-    let mensagem = ''
-
-    tiposDeErro.forEach(erro => {
-        if(input.validity[erro]) {
-            mensagem = mensagensDeErro[tipoDeInput][erro]
-        }
-    })
-
-    return mensagem
 }
 
 const validadores = {
@@ -61,11 +48,24 @@ const validadores = {
     cpf:input => validaCPF(input)
 }
 
+function mostraMensagemDeErro(tipoDeInput, input) {
+    let mensagem = ''
+    
+    tiposDeErro.forEach(erro => {
+        if(input.validity[erro]) {
+            mensagem = mensagensDeErro[tipoDeInput][erro]
+        }
+    })
+    
+    return mensagem
+}
+
 function validaDataNascimento(input) {
     const dataRecebida = new Date(input.value)
     let mensagem = ''
-    if(!maiorQue18(dataRecebida)){
-        mensagem = 'Você deve ser maior que 18 anos para se cadastrar'
+
+    if(!maiorQue18(dataRecebida)) {
+        mensagem = 'Você deve ser maior que 18 anos para se cadastrar.'
     }
 
     input.setCustomValidity(mensagem)
@@ -82,8 +82,8 @@ function validaCPF(input) {
     const cpfFormatado = input.value.replace(/\D/g, '')
     let mensagem = ''
 
-    if(!checaCPFRepetido(cpfFormatado)){
-        mensagem = 'O CPF digitado não é valido'
+    if(!checaCPFRepetido(cpfFormatado) || !checaEstruturaCPF(cpfFormatado)) {
+        mensagem = 'O CPF digitado não é válido.'
     }
 
     input.setCustomValidity(mensagem)
@@ -111,4 +111,36 @@ function checaCPFRepetido(cpf) {
     })
 
     return cpfValido
+}
+
+function checaEstruturaCPF(cpf) {
+    const multiplicador = 10
+
+    return checaDigitoVerificador(cpf, multiplicador)
+}
+
+function checaDigitoVerificador(cpf, multiplicador) {
+    if(multiplicador >= 12) {
+        return true
+    }
+
+    let multiplicadorInicial = multiplicador
+    let soma = 0
+    const cpfSemDigitos = cpf.substr(0, multiplicador - 1).split('')
+    const digitoVerificador = cpf.charAt(multiplicador - 1)
+
+    for(let contador = 0; multiplicadorInicial > 1 ; multiplicadorInicial--) {
+        soma = soma + cpfSemDigitos[contador] * multiplicadorInicial
+        contador++
+    }
+
+    if(digitoVerificador == confirmaDigito(soma)) {
+        return checaDigitoVerificador(cpf, multiplicador + 1)
+    }
+
+    return false
+}
+
+function confirmaDigito(soma) {
+    return 11 - (soma % 11)
 }
