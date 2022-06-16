@@ -1,9 +1,14 @@
-const dataNascimento = document.querySelector('#nascimento')
+export function valida(input) {
+    const tipoDeInput = input.dataset.tipo
 
-// o blur é quando a gente perde o foco do campo
-dataNascimento.addEventListener('blur', (evento) => { 
-    validaDataNascimento(evento.target)
-})
+    if(validadores[tipoDeInput]) {
+        validadores[tipoDeInput](input)
+    }
+}
+
+const validadores = {
+    dataNascimento:input => validaDataNascimento(input)
+}
 
 function validaDataNascimento(input) {
     const dataRecebida = new Date(input.value)
